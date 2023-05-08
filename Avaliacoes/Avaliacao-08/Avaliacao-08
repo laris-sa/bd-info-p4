@@ -1,0 +1,30 @@
+//Escrever um trecho de programa em Javascript que faz as seguintes operações:
+//1) Abre um banco de dados para leitura e gravação;
+//2) Cria uma tabela;
+//3) Insere 5 registros nessa tabela;
+//4) Executa um comando select e mostra os registros resultado do select.
+
+
+const sqlite3 = require('sqlite3').verbose();
+// criar o banco de dados
+let db = new sqlite3.Database('BD_DISCIPLINAS', (err) => {
+  if (err) {
+    return console.error(err.message);
+  }
+  console.log('Banco de Dados Criado.');
+});
+
+db.serialize(function() {
+
+// Create a table
+ db.run("CREATE TABLE IF NOT EXISTS TB_DISCIPLINAS (id INTEGER PRIMARY KEY, nome TEXT)");
+// Insert data into the table
+ db.run("INSERT INTO TB_DISCIPLINAS (nome) VALUES ('BANCO DE DADOS'), ('Redes de Computadores'), ('MFDS'), ('PRÁTICA PROFISSIONAL 1'), ('PROGRAMAÇÃO DE DISPOSITIVOS MÓVEIS 1') ");
+// Query data from the table
+ db.each("SELECT id, nome FROM TB_DISCIPLINAS", function(err, row) {
+    console.log(row.id + ": " + row.nome);
+  });
+});
+ 
+// fechar a conexão com o banco de dados
+db.close
