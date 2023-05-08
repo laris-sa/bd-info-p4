@@ -16,11 +16,13 @@ let db = new sqlite3.Database('BD_DISCIPLINAS', (err) => {
 
 db.serialize(function() {
 
-// Create a table
+// 2) Cria a tabela
  db.run("CREATE TABLE IF NOT EXISTS TB_DISCIPLINAS (id INTEGER PRIMARY KEY, nome TEXT)");
-// Insert data into the table
+ 
+// 3) insere 5 disciplinas
  db.run("INSERT INTO TB_DISCIPLINAS (nome) VALUES ('BANCO DE DADOS'), ('Redes de Computadores'), ('MFDS'), ('PRÁTICA PROFISSIONAL 1'), ('PROGRAMAÇÃO DE DISPOSITIVOS MÓVEIS 1') ");
-// Query data from the table
+
+// 4) seleciona para mostar os id e nome de cada disciplina
  db.each("SELECT id, nome FROM TB_DISCIPLINAS", function(err, row) {
     console.log(row.id + ": " + row.nome);
   });
