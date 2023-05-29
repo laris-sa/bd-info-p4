@@ -1,3 +1,44 @@
-Avaliacoes
+//Avaliação 09
+//Usando o Knex, criar uma aplicação que inicia com a criação de migrations. Seguir os tutoriais anexos abaixo.
 
-devhints docke
+const knex = require('knex');
+
+exports.up = function(knex) {
+    return knex.schema
+    .createTable('TB_CLIENTES', function(table){
+        table.increments('ID').primary();
+        table.string('NOME_CLI');
+        table.string('END_CLI');
+    })
+    .createTable('TB_VENDEDORES', function(table){
+        table.increments('ID').primary();
+        table.string('NOME_VEND');
+    })
+    .createTable('TB_PRODUTOS', function(table){
+        table.increments('ID').primary();
+        table.string('NOME_PROD');
+        table.string('PRECO_UNIT');
+    })
+    .createTable('TB_NOTAS_FISCAIS', function(table){
+        table.integer('Num_NF').primary();
+        table.integer('COD_CLI').references('ID').inTable('TB_CLIENTES');
+        table.integer('COD_VEND').references('ID').inTable('TB_VENDEDORES');
+        table.string('SERIE_NF');
+    })
+    .createTable('TB_ITENS_NOTAS_FISCAIS', function(table){
+        table.integer('NUM_NF').references('NUM_NF').inTable('TB_NOTAS_FISCAIS');
+        table.integer('COD_PRO').references('ID').inTable('TB_PRODUTOS');
+        table.integer('QTD');
+        table.primary(['NUM_NF', 'COD_PRO']);
+    });
+
+};
+
+exports.down = function(knex) {
+    return knex.schema
+    .dropTable('TB_ITENS_NOTAS_FISCAIS')
+    .dropTable('TB_NOTAS_FISCAIS')
+    .dropTable('TB_PRODUTOS')
+    .dropTable('TB_VENDEDORES')
+    .dropTable('TB_CLIENTES');
+};
