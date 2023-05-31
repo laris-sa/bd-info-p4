@@ -1,1 +1,86 @@
-Avaliacoes
+Avaliação-10 (Fazer um projeto node.js com migrations/seeds e operações CRUD)
+
+Passo 1: Configuração do projeto 
+Crie um novo diretório para o projeto e navegue até ele no terminal. Em seguida, execute o seguinte comando para criar um novo projeto Node.js e instalar as dependências necessárias:
+npm init -y
+npm install knex sqlite3
+Verifique o que foi criado no diretório. Descreva o que foi criado. 
+
+Passo 2: Configuração do banco de dados 
+Crie um novo arquivo chamado knexfile.js no diretório raiz do projeto e adicione o seguinte código:
+module.exports = {
+  development: {
+    client: 'sqlite3',
+    connection: {
+      filename: './SCA.db'
+    },
+    useNullAsDefault: true
+  }
+};
+Essa configuração define o banco de dados SQLite3 e o arquivo SCA.db como o local onde o banco de dados será criado e armazenado.
+
+Passo 3: Criação das migrações 
+Use  comando o
+
+knex migrate:make migration_name cria um arquivo com um cabeçalho composto por um timestamp. Esse comando devera ser executado no diretório chamado migrations que deve ficar no diretório raiz do projeto. Dentro do diretório migrations, crie um novo arquivo create_tables que ficará com o nome 20230531000000_create_tables.js (o número inicial representa a data e a hora atual). Adicione o seguinte código ao arquivo:
+exports.up = function(knex) {
+  return knex.schema
+    .createTable('tb_alunos', function(table) {
+      table.increments('id').primary();
+      table.string('nome').notNullable();
+      table.string('email').notNullable().unique();
+    })
+    .createTable('tb_professores', function(table) {
+      table.increments('id').primary();
+      table.string('nome').notNullable();
+      table.string('email').notNullable().unique();
+    })
+    .createTable('tb_disciplinas', function(table) {
+      table.increments('id').primary();
+      table.string('nome').notNullable();
+      table.integer('professor_id').unsigned().references('id').inTable('professores');
+    });
+};
+
+exports.down = function(knex) {
+  return knex.schema
+    .dropTableIfExists('tb_disciplinas')
+    .dropTableIfExists('tb_alunos')
+    .dropTableIfExists('tb_professores');
+};
+Usar o comando knex migrate:latest  dentro do diretório migrations. Esse comando criará as tabelas 'tb_alunos', 'tb_professores' e 'tb_disciplinas' no banco de dados SQLite3 seguindo o formato definido na ultima versão do arquivo cujo cabeçalho aponta o timestamp mais recente. 
+
+Passo 4: Criação das seeds 
+Crie um novo diretório chamado seeds no diretório raiz do projeto. Dentro do diretório seeds, crie um novo arquivo chamado 01_seed_data.js. Adicione o seguinte código ao arquivo:
+
+
+exports.seed = function(knex) {
+
+  // Deletes ALL existing entries
+  return knex('tb_alunos').del()
+    .then(function () {
+      // Inserts seed entries
+      return knex('tb_alunos').insert([
+        { nome: 'João', email: 'joao@example.com' },
+        { nome: 'Maria', email: 'maria@example.com' },
+      ]);
+    })
+    .then(function () {
+      return knex('tb_professores').del()
+        .then(function () {
+          return knex('professores').insert([
+            { nome: 'Carlos', email: 'carlos@example.com' },
+            { nome: 'Ana', email: 'ana@example.com' },
+          ]);
+        });
+    })
+    .then(function () {
+      return knex('tb_disciplinas').del()
+        .then(function () {
+          return knex('tb_disciplinas').insert([
+            { nome: 'Matemática', professor_id: 1 },
+            { nome: 'História', professor_id: 2 },
+          ]);
+        });
+    });
+};
